@@ -1,0 +1,28 @@
+apiVersion: "logging.openshift.io/v1"
+kind: ClusterLogForwarder
+metadata:
+  name: instance
+  namespace: openshift-logging
+spec:
+  inputs:
+    - name: eap-app-application
+      application:
+        selector:
+          matchLabels:
+            application: eap-app
+        namespaces:
+          - eap-demo
+  outputs:
+   - name: kafka-app
+     type: kafka
+     kafka:
+       brokers:
+         - tcp://my-cluster-kafka-bootstrap.eap-demo.svc.cluster.local:9092/
+       topic: application-log
+  pipelines:
+   - name: application-log
+     inputRefs:
+      - eap-app-application
+     outputRefs:
+      - kafka-app
+      - default
