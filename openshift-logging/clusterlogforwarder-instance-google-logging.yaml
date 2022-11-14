@@ -1,0 +1,28 @@
+apiVersion: "logging.openshift.io/v1"
+kind: "ClusterLogForwarder"
+metadata:
+  name: "instance"
+  namespace: "openshift-logging"
+spec:
+  inputs:
+    - name: eap-app-application
+      application:
+        selector:
+          matchLabels:
+            application: eap-app
+        namespaces:
+          - eap-demo
+  outputs:
+    - name: gcp-1
+      type: googleCloudLogging
+      secret:
+        name: gcp-secret
+      googleCloudLogging:
+        projectId : "rkanamor-sa-budget" 
+        logId : "ocp-logging" 
+  pipelines:
+    - name: application-log
+      inputRefs: 
+        - eap-app-application
+      outputRefs:
+        - gcp-1
